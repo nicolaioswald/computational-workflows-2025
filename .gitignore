@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-.nextflow
-work
-.nextflow.log*
-
-notebooks/day_01/differentialabundance_test
-=======
 .DS_Store
 
 .coverage
@@ -124,4 +117,3 @@ pip-wheel-metadata
 
 # Textual
 snapshot_report.html
->>>>>>> a8934f1070fe9301bc653838bfd1443a17e29550
