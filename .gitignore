@@ -1,3 +1,5 @@
-notebooks/day_*/.nextflow
-notebooks/day_*/work
+.nextflow
+work
+.nextflow.log*
+
 notebooks/day_01/differentialabundance_test
