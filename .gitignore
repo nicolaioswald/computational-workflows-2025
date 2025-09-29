@@ -1,2 +1,3 @@
-notebooks/day_01/.nextflow
-notebooks/day_01/work
+notebooks/day_*/.nextflow
+notebooks/day_*/work
+notebooks/day_*/differentialabundance_test
