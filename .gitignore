@@ -117,3 +117,18 @@ pip-wheel-metadata
 
 # Textual
 snapshot_report.html
+
+# workflow data
+work/
+.nextflow.log.*
+.nextflow/
+fetchngs/
+rnaseq_out/
+.data/
+data/
+
+differentialabundance_test/
+
+# genomes, GTFs
+*.gtf.gz
+*.fa.gz
