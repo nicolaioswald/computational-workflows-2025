@@ -132,3 +132,9 @@ differentialabundance_test/
 # genomes, GTFs
 *.gtf.gz
 *.fa.gz
+notebooks/day_02/day_02_part2 copy.ipynb
+differentialabundance/
+differentialabundance2/
+fastqc_results/
+fastq_results/
+FastQC/
