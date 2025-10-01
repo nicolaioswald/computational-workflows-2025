@@ -1,18 +1,16 @@
 FROM debian:bullseye-slim
 
-LABEL image.author.name="yourname"
-LABEL image.author.email="yourmail"
+LABEL image.author.name="Nicolai Oswald"
+LABEL image.author.email="nicolai.oswald@student.uni-tuebingen.de"
 
-# Install dependencies (wget, tar, etc.)
+# Install dependencies: wget for downloading the binaries
 RUN apt-get update && apt-get install -y \
-    wget \
-    ca-certificates
+    curl
 
 # Download and install Salmon
-RUN wget https://github.com/COMBINE-lab/salmon/releases/download/v1.5.2/salmon-1.5.2_linux_x86_64.tar.gz \
-    && tar -xzf salmon-1.5.2_linux_x86_64.tar.gz \
-    && mv salmon-1.5.2_linux_x86_64 /opt/salmon \
-    && rm salmon-1.5.2_linux_x86_64.tar.gz
+RUN curl -L https://github.com/COMBINE-lab/salmon/releases/download/v1.5.2/salmon-1.5.2_linux_x86_64.tar.gz \
+    | tar -xz -C /opt/ \
+    && mv /opt/salmon-1.5.2_linux_x86_64 /opt/salmon
 
 # Add Salmon binary to PATH
 ENV PATH="/opt/salmon/bin:${PATH}"

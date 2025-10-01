@@ -1,9 +1,10 @@
 FROM debian:bullseye-slim
 
+# install cowsay
 RUN apt-get update && apt-get install -y cowsay
 
 # Ensure cowsay is on PATH
 ENV PATH="/usr/games:${PATH}"
 
 # Default command
-CMD ["cowsay", "Hello from cowsay!"]
+CMD ["cowsay", "Moo, moo!"]
