@@ -7,6 +7,7 @@ workflow{
 
     if (params.step == 1) {
         in_ch = channel.of(1,2,3)
+        in_ch.first().view()
 
     }
 
@@ -15,6 +16,7 @@ workflow{
     if (params.step == 2) {
 
         in_ch = channel.of(1,2,3)
+        in_ch.last().view()
 
     }
 
@@ -23,6 +25,7 @@ workflow{
     if (params.step == 3) {
 
         in_ch = channel.of(1,2,3)
+        in_ch.take(2).view()
 
 
     }
@@ -32,6 +35,7 @@ workflow{
     if (params.step == 4) {
 
         in_ch = channel.of(2,3,4)
+        in_ch.map( v -> v * v ).view()
 
 
     }
@@ -50,6 +54,7 @@ workflow{
     if (params.step == 6) {
         
         in_ch = channel.of('Taylor', 'Swift')
+        in_ch.map { it -> it.reverse() }.view()
 
     }
 
@@ -58,6 +63,7 @@ workflow{
     if (params.step == 7) {
 
         in_ch = channel.fromPath('files_dir/*.fq')
+        in_ch.map( f -> [f.getName(), f] ).view()
 
         
     }
@@ -70,6 +76,11 @@ workflow{
         ch_2 = channel.of(4,5,6)
         out_ch = channel.of("a", "b", "c")
 
+        ch_1
+            .combine(ch_2)
+            .combine(out_ch)
+            .view()
+
 
     }
 
@@ -78,6 +89,7 @@ workflow{
     if (params.step == 9) {
 
         in_ch = channel.of([1,2,3], [4,5,6])
+        in_ch.flatten().view()
 
 
     }
@@ -87,6 +99,7 @@ workflow{
     if (params.step == 10) {
 
         in_ch = channel.of(1,2,3)
+        in_ch.collect().view()
 
     }
     
@@ -100,6 +113,9 @@ workflow{
     if (params.step == 11) {
 
         in_ch = channel.of([1, 'V'], [3, 'M'], [2, 'O'], [1, 'f'], [3, 'G'], [1, 'B'], [2, 'L'], [2, 'E'], [3, '33'])
+        in_ch
+            .groupTuple()
+            .view()
 
     }
 
@@ -110,6 +126,10 @@ workflow{
         left_ch = channel.of([1, 'V'], [3, 'M'], [2, 'O'], [1, 'B'], [3, '33'])
         right_ch = channel.of([1, 'f'], [3, 'G'], [2, 'L'], [2, 'E'],)
 
+        left_ch
+            .join(right_ch)
+            .view()
+
     }
 
     // Task 13 - Split the input channel into two channels, one of all the even numbers and the other of all the odd numbers. Write the output of each channel to a list
@@ -118,6 +138,19 @@ workflow{
     if (params.step == 13) {
 
         in_ch = channel.of(1,2,3,4,5,6,7,8,9,10)
+
+        in_ch.branch {
+            odd: it % 2 != 0
+            even: it % 2 == 0
+        }
+        .set { out_ch }
+
+        out_ch.odd.collect().dump(tag: 'Odd')
+        out_ch.even.collect().dump(tag: 'Even')
+
+        // even_ch = in_ch.filter( v -> v%2 == 0 ).collect().dump(tag: 'Even numbers')
+
+        // odd_ch = in_ch.filter( v -> v%2 != 0 ).collect().dump(tag: 'Odd numbers')
 
     }
 
@@ -135,7 +168,11 @@ workflow{
             ['name': 'Hagrid', 'title': 'groundkeeper'],
             ['name': 'Dobby', 'title': 'hero'],
         )
-    
+
+        in_ch
+            .map { it -> it.name }
+            .collectFile(name: 'results/names.txt', newLine: true)
+
     }
 
 

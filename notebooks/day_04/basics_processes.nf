@@ -1,16 +1,129 @@
 params.step = 0
-params.zip = 'zip'
+params.zip = 'bzip2'
 
 
 process SAYHELLO {
     debug true
+
+    script:
+    """
+    echo 'Hello World!'
+    """    
+}
+
+
+process SAYHELLO_PYTHON {
+    debug true
+
+    script:
+    """
+    #!/usr/bin/env python
+
+    print('Hello World!')
+    """
+}
+
+process SAYHELLO_PARAM {
+    debug true
+    input:
+    val greetings
+    script:
+    """
+    echo $greetings
+    """
+}
+
+process SAYHELLO_FILE {
+    debug true
+    input:
+    val greeting
+
+    script:
+    """
+    echo $greeting > greeting.txt
+    """
+}
+
+process UPPERCASE {
+    debug true
+
+    input:
+    val s
+
+    output:
+    path "upper.txt"
+
+    script:
+    """
+    echo "$s" | tr '[:lower:]' '[:upper:]' > upper.txt
+    """
+}
+
+process PRINTUPPER {
+    debug true
+
+    input:
+    path x
+
+    script:
+    """
+    cat $x
+    """
+}
+
+process COMPRESS {
+    debug true
+
+    input:
+    path x
+
+    output:
+    path "*"
+    script:
+    if( params.zip == 'zip' ) {
+        """
+        zip ${x}.zip ${x}
+        """
+    } else if( params.zip == 'gzip' ) {
+        """
+        gzip -c ${x} > ${x}.gz
+        """
+    } else if( params.zip == 'bzip2' ) {
+        """
+        bzip2 -c ${x} > ${x}.bz2
+        """
+    }
+}
+
+process COMPRESS_ALL {
+    debug true
+
+    input:
+    path x
+
+    output:
+    // path "*.zip"
+    // path "*.gz"
+    // path "*.bzip2"
+    tuple path("*.zip"), path("*.gz"), path("*.bzip2")
+
+    script:
+    """
+    zip ${x}.zip ${x}
+    gzip -c ${x} > ${x}.gz
+    bzip2 -c ${x} > ${x}.bzip2
+    """
+}
+
+process WRITETOFILE {
+    publishDir '/data/output'
 }
 
 
 
 workflow {
 
-    // Task 1 - create a process that says Hello World! (add debug true to the process right after initializing to be sable to print the output to the console)
+    // Task 1 - create a process that says Hello World! (add debug true to the process right after initializing to be able to print the output to the console)
     if (params.step == 1) {
         SAYHELLO()
     }
@@ -22,7 +135,7 @@ workflow {
 
     // Task 3 - create a process that reads in the string "Hello world!" from a channel and write it to command line
     if (params.step == 3) {
-        greeting_ch = Channel.of("Hello world!")
+        greeting_ch = channel.of("Hello world!")
         SAYHELLO_PARAM(greeting_ch)
     }
 
@@ -51,12 +164,18 @@ workflow {
     //          Print out the path to the zipped file in the console
     if (params.step == 7) {
         greeting_ch = Channel.of("Hello world!")
+        out_ch = UPPERCASE(greeting_ch)
+        out_path = COMPRESS(out_ch)
+        out_path.view()
     }
 
     // Task 8 - Create a process that zips the file created in the UPPERCASE process in "zip", "gzip" AND "bzip2" format. Print out the paths to the zipped files in the console
 
     if (params.step == 8) {
         greeting_ch = Channel.of("Hello world!")
+        out_ch = UPPERCASE(greeting_ch)
+        out_path = COMPRESS_ALL(out_ch)
+        out_path.collect().view()
     }
 
     // Task 9 - Create a process that reads in a list of names and titles from a channel and writes them to a file.
