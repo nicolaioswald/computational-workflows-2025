@@ -138,3 +138,5 @@ differentialabundance2/
 fastqc_results/
 fastq_results/
 FastQC/
+results/
+files_dir/
