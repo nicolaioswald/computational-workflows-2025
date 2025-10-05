@@ -1,5 +1,5 @@
 params.step = 0
-params.zip = 'bzip2'
+params.zip = 'zip'
 
 
 process SAYHELLO {
@@ -79,6 +79,7 @@ process COMPRESS {
 
     output:
     path "*"
+
     script:
     if( params.zip == 'zip' ) {
         """
@@ -116,10 +117,23 @@ process COMPRESS_ALL {
 }
 
 process WRITETOFILE {
-    publishDir '/data/output'
+    debug true
+
+    publishDir "results", mode: 'copy'
+
+    input:
+    // val columns
+    val lines
+
+    output:
+    path "names.tsv"
+
+    script:
+    """
+    echo -e "Name\tTitle" > names.tsv
+    echo -e "$lines" | tr -d ' [],' >> names.tsv
+    """
 }
-
-
 
 workflow {
 
@@ -155,8 +169,8 @@ workflow {
     // Task 6 - add another process that reads in the resulting file from UPPERCASE and print the content to the console (debug true). WHAT CHANGED IN THE OUTPUT?
     if (params.step == 6) {
         greeting_ch = Channel.of("Hello world!")
-        out_ch = UPPERCASE(greeting_ch)
-        PRINTUPPER(out_ch)
+        UPPERCASE(greeting_ch)
+        PRINTUPPER(UPPERCASE.out)
     }
 
     
@@ -164,18 +178,17 @@ workflow {
     //          Print out the path to the zipped file in the console
     if (params.step == 7) {
         greeting_ch = Channel.of("Hello world!")
-        out_ch = UPPERCASE(greeting_ch)
-        out_path = COMPRESS(out_ch)
-        out_path.view()
+        UPPERCASE(greeting_ch)
+        COMPRESS(UPPERCASE.out).view()
+
     }
 
     // Task 8 - Create a process that zips the file created in the UPPERCASE process in "zip", "gzip" AND "bzip2" format. Print out the paths to the zipped files in the console
 
     if (params.step == 8) {
         greeting_ch = Channel.of("Hello world!")
-        out_ch = UPPERCASE(greeting_ch)
-        out_path = COMPRESS_ALL(out_ch)
-        out_path.collect().view()
+        UPPERCASE(greeting_ch)
+        COMPRESS_ALL(UPPERCASE.out).collect().view()
     }
 
     // Task 9 - Create a process that reads in a list of names and titles from a channel and writes them to a file.
@@ -193,8 +206,10 @@ workflow {
         )
 
         in_ch
+            .flatMap { rec -> "${rec.name}\t${rec.title}\n" }
+            .collect()
+            .view()
             | WRITETOFILE
-            // continue here
     }
 
 }
