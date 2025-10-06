@@ -15,7 +15,6 @@ process SPLITLETTERS {
     """
     echo "${names.input_str}" > tmp.txt
     fold -w "${meta.block_size}" "tmp.txt" | awk '{ print > "${names.out_name}_block_" NR ".txt" }'
-
     """
 } 
 
@@ -28,13 +27,30 @@ process CONVERTTOUPPER {
     path x
 
     output:
-    path "${x}_upper.txt"
+    stdout
 
     script:
     """
-    cat ${x} | tr '[:lower:]' '[:upper:]' > ${x}_upper.txt
+    cat ${x} | tr '[:lower:]' '[:upper:]'
     """
-} 
+}
+
+process WRITETOFILE {
+    debug true
+    publishDir "results", mode: "copy"
+
+    input:
+    val block
+
+    output:
+    path "chunk_*_upper.txt"
+
+    script:
+    """
+    printf "%s" "${block}" > 'chunk_${block}_upper.txt'
+    """
+}
+
 
 workflow { 
     // 1. Read in the samplesheet (samplesheet_2.csv)  into a channel. The block_size will be the meta-map
@@ -54,13 +70,13 @@ workflow {
 
 
     // read in samplesheet}
-
     // split the input string into chunks
-
     // lets remove the metamap to make it easier for us, as we won't need it anymore
-
     // convert the chunks to uppercase and save the files to the results directory
-
+    WRITETOFILE(CONVERTTOUPPER.out
+                              .map { it -> it.strip() })    // remove newlines
+        .view{ it -> "Output path: $it" }
+    
 
 
 }

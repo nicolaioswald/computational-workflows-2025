@@ -15,12 +15,10 @@ process SAYHELLO {
 process SAYHELLO_PYTHON {
     debug true
 
-    script:
-    """
-    #!/usr/bin/env python
-
-    print('Hello World!')
-    """
+        script:
+        """
+        python "${projectDir}/scripts/say_hello.py"
+        """
 }
 
 process SAYHELLO_PARAM {
