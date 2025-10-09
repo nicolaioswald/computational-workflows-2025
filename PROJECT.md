@@ -1,10 +1,10 @@
 # Fill out your Project Information
 
-Student1: \<name-1>
+Student1: \Nicolai Oswald
 
-Student2: \<name-2>
+Student2: \Mohamed Mehdi Merbah
 
-Project Github url: \<github-url> 
+Project Github url: \https://github.com/mehdimerbah/nf-core-rnaseq 
 
 
 # Next steps
